@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact — CostlyCart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #080808; --surface: #111111; --border: #222222;
+      --amber: #f07d00; --amber-dim: rgba(240,125,0,0.12);
+      --text: #e8e0d5; --muted: #666; --white: #f5f0ea;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-weight: 300;
+      min-height: 100vh; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: linear-gradient(rgba(240,125,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(240,125,0,0.03) 1px, transparent 1px);
+      background-size: 60px 60px; pointer-events: none; z-index: 0;
+    }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 3rem; background: rgba(8,8,8,0.85);
+      backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.12em; color: var(--white); text-decoration: none; }
+    .nav-logo span { color: var(--amber); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--amber); }
+
+    .page-header {
+      position: relative; z-index: 1;
+      padding: 10rem 3rem 4rem; max-width: 1100px; margin: 0 auto;
+      opacity: 0; animation: up 0.9s ease 0.2s forwards;
+    }
+    .section-tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--amber); margin-bottom: 1rem; }
+    h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4rem, 10vw, 8rem); color: var(--white); letter-spacing: 0.04em; line-height: 0.95; }
+
+    .contact-wrap {
+      position: relative; z-index: 1;
+      max-width: 1100px; margin: 0 auto;
+      padding: 0 3rem 6rem;
+      display: grid; grid-template-columns: 1fr 1.4fr;
+      gap: 5rem; align-items: start;
+    }
+
+    /* Left column info */
+    .contact-info { }
+    .info-block { margin-bottom: 3rem; }
+    .info-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.8rem; }
+    .info-value { font-size: 1rem; color: var(--text); line-height: 1.8; }
+    .info-value a { color: var(--amber); text-decoration: none; }
+    .info-value a:hover { text-decoration: underline; }
+
+    .response-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid var(--amber); padding: 1.8rem 2rem; margin-top: 2rem;
+    }
+    .response-box p { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.05em; color: var(--muted); line-height: 1.8; }
+    .response-box strong { color: var(--amber); }
+
+    /* Form */
+    .form-section-title { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--amber); margin-bottom: 1.5rem; }
+    .field { margin-bottom: 1.4rem; }
+    label { display: block; font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+    input[type="text"], input[type="email"], select, textarea {
+      width: 100%; background: var(--surface);
+      border: 1px solid var(--border); color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+      padding: 0.85rem 1rem; outline: none; transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--amber); }
+    textarea { resize: vertical; min-height: 150px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .btn-submit {
+      width: 100%; font-family: 'DM Mono', monospace; font-size: 0.8rem;
+      letter-spacing: 0.2em; text-transform: uppercase; padding: 1.2rem;
+      border: 1px solid var(--amber); color: var(--bg); background: var(--amber);
+      cursor: pointer; transition: all 0.2s; margin-top: 0.5rem;
+    }
+    .btn-submit:hover { background: transparent; color: var(--amber); }
+
+    .success-msg {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: var(--bg); align-items: center; justify-content: center;
+      flex-direction: column; text-align: center; padding: 3rem;
+    }
+    .success-msg.show { display: flex; }
+    .success-icon { font-size: 4rem; margin-bottom: 1.5rem; }
+    .success-msg h2 { font-family: 'Bebas Neue', sans-serif; font-size: 4rem; color: var(--white); margin-bottom: 1rem; }
+    .success-msg p { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--muted); letter-spacing: 0.1em; line-height: 1.8; max-width: 400px; }
+    .success-msg a { display: inline-block; margin-top: 2rem; font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none; padding: 1rem 2.2rem; border: 1px solid var(--amber); color: var(--amber); transition: all 0.2s; }
+    .success-msg a:hover { background: var(--amber); color: var(--bg); }
+
+    footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 2rem 3rem; display: flex; justify-content: space-between; align-items: center; }
+    footer p { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: var(--muted); }
+
+    @keyframes up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 900px) {
+      .contact-wrap { grid-template-columns: 1fr; gap: 2rem; }
+      .page-header, .contact-wrap { padding-left: 1.5rem; padding-right: 1.5rem; }
+      nav { padding: 1.2rem 1.5rem; } .nav-links { gap: 1.5rem; }
+      .field-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">STRA<span>T</span>UM</a>
+  <ul class="nav-links">
+    <li><a href="index.html">About</a></li>
+    <li><a href="pricing.html">Pricing</a></li>
+    <li><a href="order.html">Order</a></li>
+    <li><a href="contact.html" class="active">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <p class="section-tag">// Get in Touch</p>
+  <h1>CONTACT</h1>
+</div>
+
+<div class="success-msg" id="success">
+  <div class="success-icon">✦</div>
+  <h2>MESSAGE SENT</h2>
+  <p>We'll get back to you as soon as possible — usually within a few hours.</p>
+  <a href="index.html">Back to Home</a>
+</div>
+
+<div class="contact-wrap">
+  <!-- LEFT: Info -->
+  <div class="contact-info">
+    <div class="info-block">
+      <div class="info-label">// Email</div>
+      <div class="info-value">
+        <a href="mailto:rmnelson@costlycart.com">rmnelson@costlycart.com</a>
+      </div>
+    </div>
+    <div class="info-block">
+      <div class="info-label">// Hours</div>
+      <div class="info-value">
+        Monday — Friday<br>
+        9:00am – 6:00pm local time<br>
+        <span style="color:var(--muted); font-size:0.85rem;">Weekend orders accepted, quoted Monday.</span>
+      </div>
+    </div>
+    <div class="info-block">
+      <div class="info-label">// Ready to Order?</div>
+      <div class="info-value">
+        <a href="order.html">Go to the order form →</a>
+      </div>
+    </div>
+
+    <div class="response-box">
+      <p>
+        <strong>Typical response time: 2–4 hours</strong><br><br>
+        For urgent requests or large orders,
+        mention it in your message and we'll prioritise your quote.
+      </p>
+    </div>
+  </div>
+
+  <!-- RIGHT: Contact form -->
+  <div>
+    <!-- ============================================================ -->
+    <!-- Replace YOUR_FORM_ID with your Formspree form ID            -->
+    <!-- (same account as your order form, or create a separate one) -->
+    <!-- ============================================================ -->
+    <form id="contact-form" action="https://formspree.io/f/xojkqaqn" method="POST">
+      <div class="form-section-title">// Send a Message</div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="name">Name *</label>
+          <input type="text" id="name" name="name" required placeholder="Your name"/>
+        </div>
+        <div class="field">
+          <label for="email">Email *</label>
+          <input type="email" id="email" name="email" required placeholder="your@email.com"/>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="subject">Subject</label>
+        <select id="subject" name="subject">
+          <option value="" disabled selected>Select a topic</option>
+          <option>General Question</option>
+          <option>Quote Request</option>
+          <option>Existing Order</option>
+          <option>Material / Technical Question</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="message">Message *</label>
+        <textarea id="message" name="message" required placeholder="What can we help you with?"></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit">Send Message →</button>
+    </form>
+  </div>
+</div>
+
+<footer>
+  <p>© 2026 CostlyCart. All rights reserved.</p>
+  <p>24-hour 3D printing on demand.</p>
+</footer>
+
+<script>
+  const form = document.getElementById('contact-form');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const res = await fetch(form.action, {
+      method: 'POST', body: new FormData(form),
+      headers: { 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      document.getElementById('success').classList.add('show');
+    } else {
+      alert('Something went wrong. Please email us directly.');
+    }
+  });
+</script>
+</body>
+</html>

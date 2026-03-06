@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CostlyCart — 3D Printing On Demand</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #080808;
+      --surface: #111111;
+      --border: #222222;
+      --amber: #f07d00;
+      --amber-dim: rgba(240,125,0,0.12);
+      --text: #e8e0d5;
+      --muted: #666;
+      --white: #f5f0ea;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(240,125,0,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(240,125,0,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.4rem 3rem;
+      background: rgba(8,8,8,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.12em;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--amber); }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover, .nav-links a.active { color: var(--amber); }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8rem 3rem 4rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .hero-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 1.8rem;
+      opacity: 0;
+      animation: up 0.8s ease 0.2s forwards;
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 13vw, 11rem);
+      line-height: 0.92;
+      letter-spacing: 0.03em;
+      color: var(--white);
+      opacity: 0;
+      animation: up 0.9s ease 0.4s forwards;
+    }
+
+    h1 .accent { color: var(--amber); }
+
+    .hero-sub {
+      margin-top: 2.5rem;
+      max-width: 520px;
+      font-size: clamp(1rem, 1.8vw, 1.15rem);
+      line-height: 1.75;
+      color: #a89e95;
+      opacity: 0;
+      animation: up 0.9s ease 0.65s forwards;
+    }
+
+    .hero-cta {
+      margin-top: 3rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: up 0.9s ease 0.85s forwards;
+    }
+
+    .btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 1rem 2.2rem;
+      border: 1px solid var(--amber);
+      color: var(--bg);
+      background: var(--amber);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .btn:hover { background: transparent; color: var(--amber); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .btn-ghost:hover { border-color: var(--amber); color: var(--amber); }
+
+    /* STAT ROW */
+    .stats {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin: 0;
+    }
+
+    .stat {
+      padding: 3rem;
+      border-right: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .stat:last-child { border-right: none; }
+
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 6vw, 5rem);
+      color: var(--amber);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 0.5rem;
+    }
+
+    /* ABOUT SECTION */
+    .section {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 7rem 3rem;
+    }
+
+    .section-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 1.5rem;
+    }
+
+    h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      color: var(--white);
+      letter-spacing: 0.04em;
+      line-height: 1;
+      margin-bottom: 2rem;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+      margin-top: 3rem;
+    }
+
+    .about-text p {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: #a89e95;
+      margin-bottom: 1.2rem;
+    }
+
+    .about-text p strong { color: var(--text); font-weight: 400; }
+
+    /* Feature cards */
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: var(--border);
+    }
+
+    .feature {
+      background: var(--surface);
+      padding: 1.8rem 2rem;
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+      transition: background 0.2s;
+    }
+
+    .feature:hover { background: var(--amber-dim); }
+
+    .feature-icon {
+      font-size: 1.4rem;
+      margin-top: 0.1rem;
+      flex-shrink: 0;
+    }
+
+    .feature-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 0.4rem;
+    }
+
+    .feature-desc {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* HOW IT WORKS */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      margin-top: 3rem;
+    }
+
+    .step {
+      background: var(--bg);
+      padding: 2.5rem 2rem;
+      position: relative;
+    }
+
+    .step-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem;
+      color: var(--amber-dim);
+      line-height: 1;
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+      border: 2px solid var(--amber-dim);
+      width: 3.5rem;
+      height: 3.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      color: var(--amber);
+    }
+
+    .step-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    .step-desc {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* FOOTER CTA */
+    .footer-cta {
+      position: relative;
+      z-index: 1;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 6rem 3rem;
+    }
+
+    .footer-cta h2 { margin-bottom: 1rem; }
+    .footer-cta p { color: var(--muted); margin-bottom: 2.5rem; font-family: 'DM Mono', monospace; font-size: 0.8rem; letter-spacing: 0.1em; }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    footer p {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    @keyframes up {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 1.2rem 1.5rem; }
+      .nav-links { gap: 1.5rem; }
+      .hero { padding: 7rem 1.5rem 3rem; }
+      .stats { grid-template-columns: 1fr; }
+      .stat { border-right: none; border-bottom: 1px solid var(--border); }
+      .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .steps { grid-template-columns: 1fr 1fr; }
+      .section { padding: 4rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">STRA<span>T</span>UM</a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">About</a></li>
+    <li><a href="pricing.html">Pricing</a></li>
+    <li><a href="order.html">Order</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-tag">// 3D Printing — 24hr Turnaround</p>
+  <h1>PARTS.<br><span class="accent">FAST.</span></h1>
+  <p class="hero-sub">
+    Send us your file. We print it. You have it within <strong>24 hours.</strong>
+    Custom 3D printed parts made to your exact specifications — no minimums, no delays.
+  </p>
+  <div class="hero-cta">
+    <a href="order.html" class="btn">Start an Order</a>
+    <a href="pricing.html" class="btn btn-ghost">View Pricing</a>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat-num">24H</div>
+    <div class="stat-label">Turnaround Guaranteed</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">5+</div>
+    <div class="stat-label">Materials Available</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">0</div>
+    <div class="stat-label">Minimum Order Quantity</div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="section">
+  <p class="section-tag">// About CostlyCart</p>
+  <h2>PRECISION,<br>DELIVERED.</h2>
+
+  <div class="about-grid">
+    <div class="about-text">
+      <p>
+        CostlyCart is a <strong>on-demand 3D printing service</strong> built for people who need parts quickly and reliably.
+        Whether you're a hobbyist, engineer, or small business — we turn your digital files into physical parts, fast.
+      </p>
+      <p>
+        Upload your <strong>.STL, .OBJ, or .STEP file</strong> through our order form, choose your material and finish,
+        and we'll have it printed and on its way to you within 24 hours of confirmation.
+      </p>
+      <p>
+        No large-run commitments. No lengthy back-and-forth. Just <strong>clean, accurate prints</strong> made to order.
+      </p>
+      <a href="order.html" class="btn" style="margin-top:1rem; display:inline-block;">Place an Order</a>
+    </div>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">⚡</div>
+        <div>
+          <div class="feature-title">24-Hour Turnaround</div>
+          <div class="feature-desc">Most orders ship within one business day of confirmation.</div>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🎯</div>
+        <div>
+          <div class="feature-title">High Accuracy</div>
+          <div class="feature-desc">Dimensional tolerances to ±0.2mm on standard prints.</div>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🧱</div>
+        <div>
+          <div class="feature-title">Multiple Materials</div>
+          <div class="feature-desc">PLA, PETG, ABS, TPU and more — priced by material and size.</div>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📦</div>
+        <div>
+          <div class="feature-title">No Minimums</div>
+          <div class="feature-desc">Order a single part or a hundred. We handle both the same way.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" style="padding-top:0;">
+  <p class="section-tag">// Process</p>
+  <h2>HOW IT WORKS</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-title">Submit Your File</div>
+      <div class="step-desc">Fill out the order form and upload your 3D file (.STL, .OBJ, or .STEP).</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-title">Get a Quote</div>
+      <div class="step-desc">We review your file and send a price based on size and material within a few hours.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-title">We Print It</div>
+      <div class="step-desc">Once confirmed, your part goes straight into the print queue.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-title">Delivered to You</div>
+      <div class="step-desc">Shipped or handed off within 24 hours. Done.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER CTA -->
+<div class="footer-cta">
+  <h2>READY TO BUILD?</h2>
+  <p>// Upload your file and get a quote today</p>
+  <a href="order.html" class="btn">Start Your Order</a>
+</div>
+
+<footer>
+  <p>© 2026 CostlyCart. All rights reserved.</p>
+  <p>24-hour 3D printing on demand.</p>
+</footer>
+
+</body>
+</html>

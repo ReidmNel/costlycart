@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pricing — CostlyCart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #080808; --surface: #111111; --border: #222222;
+      --amber: #f07d00; --amber-dim: rgba(240,125,0,0.12);
+      --text: #e8e0d5; --muted: #666; --white: #f5f0ea;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-weight: 300;
+      min-height: 100vh; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: linear-gradient(rgba(240,125,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(240,125,0,0.03) 1px, transparent 1px);
+      background-size: 60px 60px; pointer-events: none; z-index: 0;
+    }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 3rem; background: rgba(8,8,8,0.85);
+      backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.12em; color: var(--white); text-decoration: none; }
+    .nav-logo span { color: var(--amber); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--amber); }
+
+    .page-header {
+      position: relative; z-index: 1;
+      padding: 10rem 3rem 5rem; max-width: 1100px; margin: 0 auto;
+      opacity: 0; animation: up 0.9s ease 0.2s forwards;
+    }
+    .section-tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--amber); margin-bottom: 1rem; }
+    h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4rem, 10vw, 8rem); color: var(--white); letter-spacing: 0.04em; line-height: 0.95; }
+    .header-sub { margin-top: 1.5rem; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.8rem; letter-spacing: 0.1em; max-width: 500px; line-height: 1.8; }
+
+    .section { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 3rem 6rem; }
+    h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem, 4vw, 3.5rem); color: var(--white); letter-spacing: 0.04em; margin-bottom: 2rem; }
+
+    /* Material cards */
+    .materials { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); margin-bottom: 5rem; }
+    .material-card { background: var(--surface); padding: 2.5rem 2rem; transition: background 0.2s; cursor: default; }
+    .material-card:hover { background: var(--amber-dim); }
+    .mat-name { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; color: var(--white); letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+    .mat-tag { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); margin-bottom: 1.2rem; }
+    .mat-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; }
+    .mat-props { display: flex; flex-direction: column; gap: 0.5rem; }
+    .mat-prop { display: flex; justify-content: space-between; font-family: 'DM Mono', monospace; font-size: 0.7rem; border-top: 1px solid var(--border); padding-top: 0.5rem; }
+    .mat-prop span:first-child { color: var(--muted); }
+    .mat-prop span:last-child { color: var(--text); }
+
+    /* Pricing table */
+    .price-table { width: 100%; border-collapse: collapse; margin-bottom: 5rem; }
+    .price-table th {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--amber); text-align: left;
+      padding: 1rem 1.5rem; border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .price-table td { padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--text); }
+    .price-table tr:hover td { background: var(--amber-dim); }
+    .price-table .size-label { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--white); }
+    .price-table .size-dim { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
+
+    /* Notes */
+    .notes { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--amber); padding: 2rem 2.5rem; margin-bottom: 3rem; }
+    .notes-title { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); margin-bottom: 1rem; }
+    .notes ul { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .notes li { font-size: 0.9rem; color: var(--muted); line-height: 1.6; padding-left: 1.2rem; position: relative; }
+    .notes li::before { content: '→'; position: absolute; left: 0; color: var(--amber); font-size: 0.8rem; }
+
+    .btn { font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none; padding: 1rem 2.2rem; border: 1px solid var(--amber); color: var(--bg); background: var(--amber); transition: all 0.2s; display: inline-block; }
+    .btn:hover { background: transparent; color: var(--amber); }
+
+    footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 2rem 3rem; display: flex; justify-content: space-between; align-items: center; }
+    footer p { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: var(--muted); }
+
+    @keyframes up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 768px) {
+      nav { padding: 1.2rem 1.5rem; } .nav-links { gap: 1.5rem; }
+      .page-header, .section { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .materials { grid-template-columns: 1fr; }
+      .price-table th, .price-table td { padding: 0.9rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">STRA<span>T</span>UM</a>
+  <ul class="nav-links">
+    <li><a href="index.html">About</a></li>
+    <li><a href="pricing.html" class="active">Pricing</a></li>
+    <li><a href="order.html">Order</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <p class="section-tag">// Transparent Pricing</p>
+  <h1>PRICING</h1>
+  <p class="header-sub">All prices are base estimates. Final quotes are confirmed after file review — complexity, supports, and infill may affect cost.</p>
+</div>
+
+<div class="section">
+
+  <!-- Materials -->
+  <h2>MATERIALS</h2>
+  <div class="materials">
+    <div class="material-card">
+      <div class="mat-name">PLA</div>
+      <div class="mat-tag">Standard</div>
+      <div class="mat-desc">Best for general-purpose parts, prototypes, and decorative pieces. Easy to print with great surface finish.</div>
+      <div class="mat-props">
+        <div class="mat-prop"><span>Strength</span><span>Medium</span></div>
+        <div class="mat-prop"><span>Flexibility</span><span>Rigid</span></div>
+        <div class="mat-prop"><span>Heat Resistance</span><span>Low</span></div>
+        <div class="mat-prop"><span>Base Price</span><span>Lowest</span></div>
+      </div>
+    </div>
+    <div class="material-card">
+      <div class="mat-name">PETG</div>
+      <div class="mat-tag">Recommended</div>
+      <div class="mat-desc">Great all-rounder. Stronger than PLA, slightly flexible, food-safe options available. Good for functional parts.</div>
+      <div class="mat-props">
+        <div class="mat-prop"><span>Strength</span><span>High</span></div>
+        <div class="mat-prop"><span>Flexibility</span><span>Semi-flex</span></div>
+        <div class="mat-prop"><span>Heat Resistance</span><span>Medium</span></div>
+        <div class="mat-prop"><span>Base Price</span><span>Low</span></div>
+      </div>
+    </div>
+    <div class="material-card">
+      <div class="mat-name">ABS</div>
+      <div class="mat-tag">Engineering</div>
+      <div class="mat-desc">Durable, impact-resistant, and suitable for higher temperatures. Ideal for mechanical or automotive applications.</div>
+      <div class="mat-props">
+        <div class="mat-prop"><span>Strength</span><span>High</span></div>
+        <div class="mat-prop"><span>Flexibility</span><span>Rigid</span></div>
+        <div class="mat-prop"><span>Heat Resistance</span><span>High</span></div>
+        <div class="mat-prop"><span>Base Price</span><span>Medium</span></div>
+      </div>
+    </div>
+    <div class="material-card">
+      <div class="mat-name">TPU</div>
+      <div class="mat-tag">Flexible</div>
+      <div class="mat-desc">Rubber-like and highly flexible. Perfect for gaskets, grips, phone cases, and any part that needs to bend.</div>
+      <div class="mat-props">
+        <div class="mat-prop"><span>Strength</span><span>Medium</span></div>
+        <div class="mat-prop"><span>Flexibility</span><span>Very Flexible</span></div>
+        <div class="mat-prop"><span>Heat Resistance</span><span>Medium</span></div>
+        <div class="mat-prop"><span>Base Price</span><span>Medium</span></div>
+      </div>
+    </div>
+    <div class="material-card">
+      <div class="mat-name">ASA</div>
+      <div class="mat-tag">Outdoor</div>
+      <div class="mat-desc">UV and weather resistant. Best for outdoor parts, enclosures, or anything exposed to sunlight long-term.</div>
+      <div class="mat-props">
+        <div class="mat-prop"><span>Strength</span><span>High</span></div>
+        <div class="mat-prop"><span>Flexibility</span><span>Rigid</span></div>
+        <div class="mat-prop"><span>Heat Resistance</span><span>High</span></div>
+        <div class="mat-prop"><span>Base Price</span><span>Medium-High</span></div>
+      </div>
+    </div>
+    <div class="material-card">
+      <div class="mat-name">?</div>
+      <div class="mat-tag">Other</div>
+      <div class="mat-desc">Need something specific — nylon, carbon-fill, or a specialty filament? Get in touch and we'll discuss options.</div>
+      <div class="mat-props">
+        <div class="mat-prop"><span>Availability</span><span>On Request</span></div>
+        <div class="mat-prop"><span>Lead Time</span><span>May Vary</span></div>
+        <div class="mat-prop"><span>Pricing</span><span>Custom Quote</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Size Pricing -->
+  <h2>SIZE-BASED PRICING</h2>
+  <table class="price-table">
+    <thead>
+      <tr>
+        <th>Size Tier</th>
+        <th>Dimensions (approx.)</th>
+        <th>PLA</th>
+        <th>PETG / ABS</th>
+        <th>TPU / ASA</th>
+        <th>Est. Print Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><div class="size-label">XS — Micro</div></td>
+        <td>Under 5cm on all sides</td>
+        <td>From $4</td>
+        <td>From $5</td>
+        <td>From $6</td>
+        <td>1–3 hrs</td>
+      </tr>
+      <tr>
+        <td><div class="size-label">S — Small</div></td>
+        <td>Up to 10cm on longest side</td>
+        <td>From $8</td>
+        <td>From $10</td>
+        <td>From $13</td>
+        <td>2–5 hrs</td>
+      </tr>
+      <tr>
+        <td><div class="size-label">M — Medium</div></td>
+        <td>Up to 20cm on longest side</td>
+        <td>From $15</td>
+        <td>From $20</td>
+        <td>From $26</td>
+        <td>4–10 hrs</td>
+      </tr>
+      <tr>
+        <td><div class="size-label">L — Large</div></td>
+        <td>Up to 30cm on longest side</td>
+        <td>From $28</td>
+        <td>From $36</td>
+        <td>From $45</td>
+        <td>8–18 hrs</td>
+      </tr>
+      <tr>
+        <td><div class="size-label">XL — Max Bed</div></td>
+        <td>Up to full bed (~35cm)</td>
+        <td>From $50</td>
+        <td>From $65</td>
+        <td>From $80</td>
+        <td>15–24 hrs</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Notes -->
+  <div class="notes">
+    <div class="notes-title">// Pricing Notes</div>
+    <ul>
+      <li>All prices are starting estimates. A confirmed quote is sent before any payment is taken.</li>
+      <li>Complex geometry, dense infill (above 40%), or heavy support usage may increase cost.</li>
+      <li>Multi-part orders may qualify for a discount — mention it in your order notes.</li>
+      <li>Shipping cost is added at quote stage depending on your location.</li>
+      <li>Parts that exceed 24hr print time may require a longer lead time — we'll flag this upfront.</li>
+    </ul>
+  </div>
+
+  <a href="order.html" class="btn">Start an Order</a>
+</div>
+
+<footer>
+  <p>© 2026 CostlyCart. All rights reserved.</p>
+  <p>24-hour 3D printing on demand.</p>
+</footer>
+
+</body>
+</html>
