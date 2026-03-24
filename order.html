@@ -3,150 +3,9 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Order — CostlyCart</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet"/>
-  <style>
-    :root {
-      --bg: #080808; --surface: #111111; --border: #222222;
-      --amber: #f07d00; --amber-dim: rgba(240,125,0,0.12);
-      --text: #e8e0d5; --muted: #666; --white: #f5f0ea;
-    }
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: var(--bg); color: var(--text);
-      font-family: 'DM Sans', sans-serif; font-weight: 300;
-      min-height: 100vh; overflow-x: hidden;
-    }
-    body::before {
-      content: ''; position: fixed; inset: 0;
-      background-image: linear-gradient(rgba(240,125,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(240,125,0,0.03) 1px, transparent 1px);
-      background-size: 60px 60px; pointer-events: none; z-index: 0;
-    }
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.4rem 3rem; background: rgba(8,8,8,0.85);
-      backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);
-    }
-    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.12em; color: var(--white); text-decoration: none; }
-    .nav-logo span { color: var(--amber); }
-    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-    .nav-links a { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
-    .nav-links a:hover, .nav-links a.active { color: var(--amber); }
-
-    .page-header {
-      position: relative; z-index: 1;
-      padding: 10rem 3rem 4rem; max-width: 1100px; margin: 0 auto;
-      opacity: 0; animation: up 0.9s ease 0.2s forwards;
-    }
-    .section-tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--amber); margin-bottom: 1rem; }
-    h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4rem, 10vw, 8rem); color: var(--white); letter-spacing: 0.04em; line-height: 0.95; }
-    .header-sub { margin-top: 1.5rem; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.8rem; letter-spacing: 0.1em; max-width: 500px; line-height: 1.8; }
-
-    /* Form layout */
-    .form-wrap {
-      position: relative; z-index: 1;
-      max-width: 1100px; margin: 0 auto;
-      padding: 0 3rem 6rem;
-      display: grid; grid-template-columns: 2fr 1fr;
-      gap: 4rem; align-items: start;
-    }
-
-    .form-section-title {
-      font-family: 'DM Mono', monospace; font-size: 0.65rem;
-      letter-spacing: 0.25em; text-transform: uppercase;
-      color: var(--amber); margin-bottom: 1.5rem; margin-top: 2.5rem;
-    }
-
-    .form-section-title:first-child { margin-top: 0; }
-
-    .field { margin-bottom: 1.4rem; }
-
-    label {
-      display: block; font-family: 'DM Mono', monospace;
-      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 0.5rem;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="number"],
-    select,
-    textarea {
-      width: 100%; background: var(--surface);
-      border: 1px solid var(--border); color: var(--text);
-      font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
-      padding: 0.85rem 1rem; outline: none;
-      transition: border-color 0.2s;
-      appearance: none; -webkit-appearance: none;
-    }
-
-    input:focus, select:focus, textarea:focus { border-color: var(--amber); }
-
-    textarea { resize: vertical; min-height: 120px; }
-
-    select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23f07d00' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; }
-
-    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-
-    /* File upload */
-    .file-upload {
-      border: 1px dashed var(--border); padding: 2.5rem;
-      text-align: center; cursor: pointer; transition: all 0.2s;
-      position: relative; background: var(--surface);
-    }
-    .file-upload:hover, .file-upload.dragover { border-color: var(--amber); background: var(--amber-dim); }
-    .file-upload input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
-    .file-icon { font-size: 2rem; margin-bottom: 0.8rem; }
-    .file-text { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; color: var(--muted); line-height: 1.8; }
-    .file-text strong { color: var(--amber); }
-    .file-name { margin-top: 0.8rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--amber); display: none; }
-
-    .btn-submit {
-      width: 100%; font-family: 'DM Mono', monospace; font-size: 0.8rem;
-      letter-spacing: 0.2em; text-transform: uppercase; padding: 1.2rem;
-      border: 1px solid var(--amber); color: var(--bg); background: var(--amber);
-      cursor: pointer; transition: all 0.2s; margin-top: 1.5rem;
-    }
-    .btn-submit:hover { background: transparent; color: var(--amber); }
-
-    /* Sidebar */
-    .sidebar { position: sticky; top: 7rem; }
-    .sidebar-box {
-      background: var(--surface); border: 1px solid var(--border);
-      padding: 2rem; margin-bottom: 1.5rem;
-    }
-    .sidebar-title { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); margin-bottom: 1.2rem; }
-    .sidebar-list { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
-    .sidebar-list li { font-size: 0.85rem; color: var(--muted); line-height: 1.6; padding-left: 1rem; position: relative; }
-    .sidebar-list li::before { content: '→'; position: absolute; left: 0; color: var(--amber); font-size: 0.75rem; }
-    .sidebar-link { display: block; font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); text-decoration: none; margin-top: 1rem; }
-    .sidebar-link:hover { text-decoration: underline; }
-
-    /* Success message */
-    .success-msg {
-      display: none; position: fixed; inset: 0; z-index: 200;
-      background: var(--bg); align-items: center; justify-content: center;
-      flex-direction: column; text-align: center; padding: 3rem;
-    }
-    .success-msg.show { display: flex; }
-    .success-icon { font-size: 4rem; margin-bottom: 1.5rem; }
-    .success-msg h2 { font-family: 'Bebas Neue', sans-serif; font-size: 4rem; color: var(--white); margin-bottom: 1rem; }
-    .success-msg p { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--muted); letter-spacing: 0.1em; line-height: 1.8; max-width: 400px; }
-    .success-msg a { display: inline-block; margin-top: 2rem; font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none; padding: 1rem 2.2rem; border: 1px solid var(--amber); color: var(--amber); transition: all 0.2s; }
-    .success-msg a:hover { background: var(--amber); color: var(--bg); }
-
-    footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 2rem 3rem; display: flex; justify-content: space-between; align-items: center; }
-    footer p { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: var(--muted); }
-
-    @keyframes up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-    @media (max-width: 900px) {
-      .form-wrap { grid-template-columns: 1fr; gap: 2rem; }
-      .sidebar { position: static; }
-      .page-header, .form-wrap { padding-left: 1.5rem; padding-right: 1.5rem; }
-      nav { padding: 1.2rem 1.5rem; } .nav-links { gap: 1.5rem; }
-    }
-  </style>
+  <title>CostlyCart — 3D Printing On Demand</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -161,17 +20,17 @@
 </nav>
 
 <div class="page-header">
-  <p class="section-tag">// Place an Order</p>
+  <p class="section-tag"> Place an Order</p>
   <h1>ORDER</h1>
-  <p class="header-sub">Fill out the form below. We'll review your file and send a confirmed quote before printing anything.</p>
+  <p class="header-sub">For <strong>Mines students and Golden locals.</strong> Fill out the form below — we'll send a confirmed quote and arrange local pickup or drop-off within 24 hours.</p>
 </div>
 
 <!-- SUCCESS SCREEN -->
 <div class="success-msg" id="success">
   <div class="success-icon">✦</div>
-  <h2>ORDER RECEIVED</h2>
+  <h2>Order Received</h2>
   <p>We've got your request. Expect a quote in your inbox within a few hours — we'll confirm before printing anything.</p>
-  <a href="index.html">Back to Home</a>
+  <a href="index.html" class="btn">Back to Home</a>
 </div>
 
 <div class="form-wrap">
@@ -185,7 +44,7 @@
   <!-- ============================================================ -->
   <form id="order-form" action="https://formspree.io/f/xojkqaqn" method="POST" enctype="multipart/form-data">
 
-    <div class="form-section-title">// Contact Details</div>
+    <div class="form-section-title"> Contact Details</div>
 
     <div class="field-row">
       <div class="field">
@@ -203,19 +62,19 @@
       <input type="text" id="phone" name="phone" placeholder="+1 (555) 000-0000"/>
     </div>
 
-    <div class="form-section-title">// Print Specifications</div>
+    <div class="form-section-title"> Print Specifications</div>
 
     <div class="field-row">
       <div class="field">
         <label for="material">Material *</label>
         <select id="material" name="material" required>
           <option value="" disabled selected>Select a material</option>
-          <option>PLA — Standard</option>
-          <option>PETG — Recommended</option>
-          <option>ABS — Engineering</option>
-          <option>TPU — Flexible</option>
-          <option>ASA — Outdoor</option>
-          <option>Other (describe below)</option>
+          <option value="PLA">PLA — Standard (Available Now)</option>
+          <option disabled>──────────────</option>
+          <option disabled>PETG — Coming Soon</option>
+          <option disabled>ABS — Coming Soon</option>
+          <option disabled>TPU — Coming Soon</option>
+          <option disabled>ASA — Coming Soon</option>
         </select>
       </div>
       <div class="field">
@@ -247,11 +106,11 @@
       <input type="text" id="size" name="dimensions" placeholder="e.g. 80mm x 40mm x 30mm"/>
     </div>
 
-    <div class="form-section-title">// Additional Notes</div>
+    <div class="form-section-title"> Additional Notes</div>
 
     <div class="field">
       <label for="notes">Notes / Special Requirements</label>
-      <textarea id="notes" name="notes" placeholder="Any specific requirements — tolerances, finish, assembly notes, urgency, etc. Once submitted, email your .STL/.OBJ/.STEP file to rmnelson@costlycart.com"></textarea>
+      <textarea id="notes" name="notes" placeholder="Any specific requirements — tolerances, finish, assembly notes, urgency, etc. Once submitted, email your .STL/.OBJ/.STEP file to design_team@costlycart.com"></textarea>
     </div>
 
     <button type="submit" class="btn-submit">Submit Order Request →</button>
@@ -260,16 +119,24 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-box">
-      <div class="sidebar-title">// What Happens Next</div>
+      <div class="sidebar-title"> What Happens Next</div>
       <ul class="sidebar-list">
         <li>We review your file and check for printability.</li>
         <li>A confirmed quote is emailed to you within a few hours.</li>
         <li>Once you approve, the part goes into the print queue.</li>
-        <li>Shipped or handed off within 24 hours of confirmation.</li>
+        <li>Ready for <strong style="color:var(--text)">local pickup or drop-off</strong> within 24 hours of confirmation.</li>
       </ul>
     </div>
     <div class="sidebar-box">
-      <div class="sidebar-title">// File Tips</div>
+      <div class="sidebar-title"> Who We Serve</div>
+      <ul class="sidebar-list">
+        <li>Currently serving <strong style="color:var(--text)">Colorado School of Mines students</strong> and people in the Golden, CO area.</li>
+        <li>Not sure if you qualify? Reach out — if you're nearby, we'll make it work.</li>
+      </ul>
+      <a href="contact.html" class="sidebar-link">Contact us →</a>
+    </div>
+    <div class="sidebar-box">
+      <div class="sidebar-title"> File Tips</div>
       <ul class="sidebar-list">
         <li>Make sure your file is a closed, watertight mesh.</li>
         <li>STL is the most common and preferred format.</li>
@@ -279,7 +146,7 @@
       <a href="pricing.html" class="sidebar-link">View pricing guide →</a>
     </div>
     <div class="sidebar-box">
-      <div class="sidebar-title">// Questions?</div>
+      <div class="sidebar-title"> Questions?</div>
       <ul class="sidebar-list">
         <li>Not sure what material to choose? Leave it as "advise me" and we'll recommend based on your use case.</li>
       </ul>
@@ -294,33 +161,21 @@
 </footer>
 
 <script>
-  // File upload display
-  const fileInput = document.getElementById('file-input');
-  const fileName  = document.getElementById('file-name');
-  const fileDrop  = document.getElementById('file-drop');
-
-  fileInput.addEventListener('change', () => {
-    if (fileInput.files[0]) {
-      fileName.textContent = '✓ ' + fileInput.files[0].name;
-      fileName.style.display = 'block';
-    }
-  });
-
-  ['dragover','dragleave','drop'].forEach(ev => {
-    fileDrop.addEventListener(ev, e => {
-      e.preventDefault();
-      fileDrop.classList.toggle('dragover', ev === 'dragover');
-    });
-  });
-
   // Form submission → show success screen
   const form = document.getElementById('order-form');
   form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // This stops the redirect to Formspree
+    
     const data = new FormData(form);
-    const res  = await fetch(form.action, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } });
+    const res  = await fetch(form.action, { 
+      method: 'POST', 
+      body: data, 
+      headers: { 'Accept': 'application/json' } 
+    });
+    
     if (res.ok) {
       document.getElementById('success').classList.add('show');
+      form.reset();
     } else {
       alert('Something went wrong. Please try again or contact us directly.');
     }
