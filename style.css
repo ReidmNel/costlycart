@@ -141,3 +141,29 @@ footer { border-top: 1px solid var(--border); padding: 2rem 3rem; display: flex;
 .success-msg.show { display: flex; }
 .success-icon { font-size: 4rem; margin-bottom: 1rem; color: var(--accent); }
 .success-msg p { color: var(--muted); font-size: 1.1rem; margin-bottom: 2rem; max-width: 400px; }
+
+/* Checkbox Formatting */
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+.checkbox-field input[type="checkbox"] {
+  width: 1.2rem;
+  height: 1.2rem;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.checkbox-field label {
+  margin-bottom: 0;
+  cursor: pointer;
+}
+.checkbox-field a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.checkbox-field a:hover {
+  text-decoration: underline;
+}
