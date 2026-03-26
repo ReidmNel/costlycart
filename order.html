@@ -3,11 +3,42 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Place a 3D print order with CostlyCart. Fill out the form and receive a quote within a few hours. Serving Colorado School of Mines and Golden, CO.">
+  <meta name="description" content="Place a 3D print order with CostlyCart. Submit a ready-to-print file or request a full design and print service. Serving Colorado School of Mines and Golden, CO.">
   <title>CostlyCart — 3D Printing On Demand</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <style>
+    .order-tabs {
+      display: flex;
+      max-width: 560px;
+      margin: 0 auto 3rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .order-tab {
+      flex: 1; padding: 1rem 1.5rem;
+      font-family: inherit; font-size: 0.95rem; font-weight: 600;
+      color: var(--muted); background: transparent; border: none;
+      cursor: pointer; transition: all 0.2s ease; text-align: center; line-height: 1.4;
+    }
+    .order-tab:first-child { border-right: 1px solid var(--border); }
+    .order-tab.active { background: var(--primary); color: white; }
+    .order-tab:not(.active):hover { background: var(--bg); color: var(--primary); }
+    .order-tab .tab-sub { display: block; font-size: 0.75rem; font-weight: 400; margin-top: 0.2rem; opacity: 0.75; }
+    .form-panel { display: none; }
+    .form-panel.active { display: contents; }
+    .design-brief-box {
+      background: var(--accent-dim); border: 1px solid #bfdbfe;
+      border-radius: 10px; padding: 1.2rem 1.5rem; margin-bottom: 1.5rem;
+      font-size: 0.9rem; color: var(--accent); line-height: 1.6;
+    }
+    .design-brief-box strong { color: var(--primary); }
+    .sidebar-link { display: inline-block; font-size: 0.9rem; font-weight: 500; color: var(--accent); text-decoration: none; margin-top: 0.8rem; }
+    .sidebar-link:hover { text-decoration: underline; }
+  </style>
 </head>
 <body>
 
@@ -22,128 +53,216 @@
 </nav>
 
 <div class="page-header">
-  <p class="section-tag"> Place an Order</p>
+  <p class="section-tag">Place an Order</p>
   <h1>ORDER</h1>
-  <p class="header-sub">For <strong>Mines students and Golden locals.</strong> Fill out the form below — we'll send a confirmed quote and arrange local pickup or drop-off within 24 hours.</p>
+  <p class="header-sub">For <strong>Mines students and Golden locals.</strong> Choose your service type below, fill out the form, and we'll be in touch within a few hours.</p>
 </div>
 
-<!-- SUCCESS SCREEN -->
 <div class="success-msg" id="success">
   <div class="success-icon">✦</div>
-  <h2>Order Received</h2>
-  <p>We've got your request. Expect a quote in your inbox within a few hours — we'll confirm before printing anything.</p>
+  <h2 id="success-title">Order Received</h2>
+  <p id="success-body">We've got your request. Expect a quote in your inbox within a few hours — we'll confirm before printing anything.</p>
   <a href="index.html" class="btn">Back to Home</a>
 </div>
 
+<div class="order-tabs">
+  <button class="order-tab active" id="tab-print" onclick="switchTab('print')">
+    🖨️ Print My File
+    <span class="tab-sub">I have a ready-to-print file</span>
+  </button>
+  <button class="order-tab" id="tab-design" onclick="switchTab('design')">
+    ✏️ Design + Print
+    <span class="tab-sub">I need a part modeled first</span>
+  </button>
+</div>
+
 <div class="form-wrap">
-  <!-- MAIN FORM -->
-  <!-- ============================================================ -->
-  <!-- FORMSPREE SETUP:                                             -->
-  <!-- 1. Go to formspree.io and create a free account             -->
-  <!-- 2. Create a new form — set the email to YOUR email address  -->
-  <!-- 3. Copy your form ID (looks like: xpzgkqrb)                 -->
-  <!-- 4. Replace YOUR_FORM_ID below with it                       -->
-  <!-- ============================================================ -->
-  <form id="order-form" action="https://formspree.io/f/xojkqaqn" method="POST">
 
-    <div class="form-section-title"> Contact Details</div>
+  <!-- PANEL 1: Standard Print -->
+  <div class="form-panel active" id="panel-print">
+    <form id="print-form" action="https://formspree.io/f/xojkqaqn" method="POST">
+      <input type="hidden" name="order_type" value="Print My File"/>
 
-    <div class="field-row">
-      <div class="field">
-        <label for="name">Full Name *</label>
-        <input type="text" id="name" name="name" required placeholder="Jane Smith"/>
+      <div class="form-section-title">Contact Details</div>
+      <div class="field-row">
+        <div class="field">
+          <label for="p-name">Full Name *</label>
+          <input type="text" id="p-name" name="name" required placeholder="Jane Smith"/>
+        </div>
+        <div class="field">
+          <label for="p-email">Email Address *</label>
+          <input type="email" id="p-email" name="email" required placeholder="jane@email.com"/>
+        </div>
       </div>
       <div class="field">
-        <label for="email">Email Address *</label>
-        <input type="email" id="email" name="email" required placeholder="jane@email.com"/>
+        <label for="p-phone">Phone (Optional)</label>
+        <input type="text" id="p-phone" name="phone" placeholder="+1 (555) 000-0000"/>
       </div>
-    </div>
 
-    <div class="field">
-      <label for="phone">Phone (Optional)</label>
-      <input type="text" id="phone" name="phone" placeholder="+1 (555) 000-0000"/>
-    </div>
-
-    <div class="form-section-title"> Print Specifications</div>
-
-    <div class="field-row">
-      <div class="field">
-        <label for="material">Material *</label>
-        <select id="material" name="material" required>
-          <option value="" disabled selected>Select a material</option>
-          <option value="PLA">PLA — Standard (Available Now)</option>
-          <option disabled>──────────────</option>
-          <option disabled>PETG — Coming Soon</option>
-          <option disabled>ABS — Coming Soon</option>
-          <option disabled>TPU — Coming Soon</option>
-          <option disabled>ASA — Coming Soon</option>
-        </select>
+      <div class="form-section-title">Print Specifications</div>
+      <div class="field-row">
+        <div class="field">
+          <label for="p-material">Material *</label>
+          <select id="p-material" name="material" required>
+            <option value="" disabled selected>Select a material</option>
+            <option value="PLA">PLA — Standard (Available Now)</option>
+            <option disabled>──────────────</option>
+            <option disabled>PETG — Coming Soon</option>
+            <option disabled>ABS — Coming Soon</option>
+            <option disabled>TPU — Coming Soon</option>
+            <option disabled>ASA — Coming Soon</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="p-colour">Colour Preference</label>
+          <input type="text" id="p-colour" name="colour" placeholder="e.g. Black, White, any"/>
+        </div>
       </div>
-      <div class="field">
-        <label for="colour">Colour Preference</label>
-        <input type="text" id="colour" name="colour" placeholder="e.g. Black, White, any"/>
-      </div>
-    </div>
-
-    <div class="field-row">
-      <div class="field">
-        <label for="infill">Infill Density</label>
-        <select id="infill" name="infill">
-          <option value="" disabled selected>Select infill</option>
-          <option>15% — Lightweight / Decorative</option>
-          <option>25% — Standard (Default)</option>
-          <option>40% — Strong</option>
-          <option>60%+ — Heavy Duty</option>
-          <option>Not sure — advise me</option>
-        </select>
+      <div class="field-row">
+        <div class="field">
+          <label for="p-infill">Infill Density</label>
+          <select id="p-infill" name="infill">
+            <option value="" disabled selected>Select infill</option>
+            <option>15% — Lightweight / Decorative</option>
+            <option>25% — Standard (Default)</option>
+            <option>40% — Strong</option>
+            <option>60%+ — Heavy Duty</option>
+            <option>Not sure — advise me</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="p-qty">Quantity *</label>
+          <input type="number" id="p-qty" name="quantity" min="1" value="1" required/>
+        </div>
       </div>
       <div class="field">
-        <label for="quantity">Quantity *</label>
-        <input type="number" id="quantity" name="quantity" min="1" value="1" required/>
+        <label for="p-dims">Approximate Dimensions (if known)</label>
+        <input type="text" id="p-dims" name="dimensions" placeholder="e.g. 80mm x 40mm x 30mm"/>
       </div>
-    </div>
 
-    <div class="field">
-      <label for="size">Approximate Dimensions (if known)</label>
-      <input type="text" id="size" name="dimensions" placeholder="e.g. 80mm x 40mm x 30mm"/>
-    </div>
+      <div class="form-section-title">Additional Notes</div>
+      <div class="field">
+        <label for="p-notes">Notes / Special Requirements</label>
+        <textarea id="p-notes" name="notes" placeholder="Any specific requirements — tolerances, finish, assembly notes, urgency, etc. Once submitted, email your .STL/.OBJ/.STEP file to design_team@costlycart.com"></textarea>
+      </div>
+      <div class="field checkbox-field">
+        <input type="checkbox" id="p-tos" name="terms_agreed" required/>
+        <label for="p-tos">I agree to the <a href="tos.html" target="_blank">Terms of Service</a> *</label>
+      </div>
+      <button type="submit" class="btn-submit">Submit Order Request →</button>
+    </form>
+  </div>
 
-    <div class="form-section-title"> Additional Notes</div>
+  <!-- PANEL 2: Design + Print -->
+  <div class="form-panel" id="panel-design">
+    <form id="design-form" action="https://formspree.io/f/xojkqaqn" method="POST">
+      <input type="hidden" name="order_type" value="Design + Print"/>
 
-    <div class="field">
-      <label for="notes">Notes / Special Requirements</label>
-      <textarea id="notes" name="notes" placeholder="Any specific requirements — tolerances, finish, assembly notes, urgency, etc. Once submitted, email your .STL/.OBJ/.STEP file to design_team@costlycart.com"></textarea>
-    </div>
+      <div class="design-brief-box">
+        <strong>How this works:</strong> Describe your idea as clearly as possible — what it does, rough dimensions, and any functional requirements. We'll review your request, follow up with any questions, and send a quote covering both the modelling and the print.
+      </div>
 
-    <div class="field checkbox-field">
-      <input type="checkbox" id="tos" name="terms_agreed" required />
-      <label for="tos">I agree to the <a href="tos.html" target="_blank">Terms of Service</a> *</label>
-    </div>
+      <div class="form-section-title">Contact Details</div>
+      <div class="field-row">
+        <div class="field">
+          <label for="d-name">Full Name *</label>
+          <input type="text" id="d-name" name="name" required placeholder="Jane Smith"/>
+        </div>
+        <div class="field">
+          <label for="d-email">Email Address *</label>
+          <input type="email" id="d-email" name="email" required placeholder="jane@email.com"/>
+        </div>
+      </div>
+      <div class="field">
+        <label for="d-phone">Phone (Optional)</label>
+        <input type="text" id="d-phone" name="phone" placeholder="+1 (555) 000-0000"/>
+      </div>
 
-    <button type="submit" class="btn-submit">Submit Order Request →</button>
-  </form>
+      <div class="form-section-title">Part Description</div>
+      <div class="field">
+        <label for="d-desc">Describe What You Need *</label>
+        <textarea id="d-desc" name="part_description" required style="min-height:160px;"
+          placeholder="Describe your idea in as much detail as possible. What is it? What does it do or attach to? Are there any specific dimensions, features, or constraints we should know about?"></textarea>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="d-dims">Approximate Dimensions (if known)</label>
+          <input type="text" id="d-dims" name="dimensions" placeholder="e.g. roughly 50mm x 30mm"/>
+        </div>
+        <div class="field">
+          <label for="d-qty">Quantity *</label>
+          <input type="number" id="d-qty" name="quantity" min="1" value="1" required/>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="d-material">Material Preference</label>
+          <select id="d-material" name="material">
+            <option value="" disabled selected>Select a material</option>
+            <option value="PLA">PLA — Standard (Available Now)</option>
+            <option disabled>──────────────</option>
+            <option disabled>PETG — Coming Soon</option>
+            <option disabled>ABS — Coming Soon</option>
+            <option disabled>TPU — Coming Soon</option>
+            <option disabled>ASA — Coming Soon</option>
+            <option value="Not sure — advise me">Not sure — advise me</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="d-colour">Colour Preference</label>
+          <input type="text" id="d-colour" name="colour" placeholder="e.g. Black, White, any"/>
+        </div>
+      </div>
+
+      <div class="form-section-title">Reference Materials</div>
+      <div class="field">
+        <label for="d-refs">Links or Additional Context (Optional)</label>
+        <textarea id="d-refs" name="references" style="min-height:80px;"
+          placeholder="Any reference images, links, or sketches. You can also email images to design_team@costlycart.com after submitting."></textarea>
+      </div>
+      <div class="field">
+        <label for="d-notes">Anything Else We Should Know?</label>
+        <textarea id="d-notes" name="notes" style="min-height:80px;"
+          placeholder="Urgency, intended use, budget constraints, etc."></textarea>
+      </div>
+      <div class="field checkbox-field">
+        <input type="checkbox" id="d-tos" name="terms_agreed" required/>
+        <label for="d-tos">I agree to the <a href="tos.html" target="_blank">Terms of Service</a> *</label>
+      </div>
+      <button type="submit" class="btn-submit">Submit Design Request →</button>
+    </form>
+  </div>
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="sidebar-box">
-      <div class="sidebar-title"> What Happens Next</div>
+    <div class="sidebar-box" id="sidebar-print-info">
+      <div class="sidebar-title">What Happens Next</div>
       <ul class="sidebar-list">
         <li>We review your file and check for printability.</li>
         <li>A confirmed quote is emailed to you within a few hours.</li>
         <li>Once you approve, the part goes into the print queue.</li>
-        <li>Ready for <strong style="color:var(--text)">local pickup or drop-off</strong> within 24 hours of confirmation.</li>
+        <li>Ready for <strong>local pickup or drop-off</strong> within 24 hours of confirmation.</li>
+      </ul>
+    </div>
+    <div class="sidebar-box" id="sidebar-design-info" style="display:none;">
+      <div class="sidebar-title">What Happens Next</div>
+      <ul class="sidebar-list">
+        <li>We review your description and may follow up with clarifying questions.</li>
+        <li>A quote covering both modelling and printing is sent to your email.</li>
+        <li>Once approved, we model the part and send you a preview before printing.</li>
+        <li>Ready for <strong>local pickup or drop-off</strong> once printing is complete.</li>
       </ul>
     </div>
     <div class="sidebar-box">
-      <div class="sidebar-title"> Who We Serve</div>
+      <div class="sidebar-title">Who We Serve</div>
       <ul class="sidebar-list">
-        <li>Currently serving <strong style="color:var(--text)">Colorado School of Mines students</strong> and people in the Golden, CO area.</li>
+        <li>Currently serving <strong>Colorado School of Mines students</strong> and people in the Golden, CO area.</li>
         <li>Not sure if you qualify? Reach out — if you're nearby, we'll make it work.</li>
       </ul>
       <a href="contact.html" class="sidebar-link">Contact us →</a>
     </div>
-    <div class="sidebar-box">
-      <div class="sidebar-title"> File Tips</div>
+    <div class="sidebar-box" id="sidebar-file-tips">
+      <div class="sidebar-title">File Tips</div>
       <ul class="sidebar-list">
         <li>Make sure your file is a closed, watertight mesh.</li>
         <li>STL is the most common and preferred format.</li>
@@ -152,14 +271,24 @@
       </ul>
       <a href="pricing.html" class="sidebar-link">View pricing guide →</a>
     </div>
-    <div class="sidebar-box">
-      <div class="sidebar-title"> Questions?</div>
+    <div class="sidebar-box" id="sidebar-design-tips" style="display:none;">
+      <div class="sidebar-title">Design Tips</div>
       <ul class="sidebar-list">
-        <li>Not sure what material to choose? Leave it as "advise me" and we'll recommend based on your use case.</li>
+        <li>The more detail you provide about function and dimensions, the faster we can quote you.</li>
+        <li>Reference images or rough sketches help — email them to design_team@costlycart.com.</li>
+        <li>Design and print quotes are provided together in one email.</li>
+      </ul>
+      <a href="pricing.html" class="sidebar-link">View pricing guide →</a>
+    </div>
+    <div class="sidebar-box">
+      <div class="sidebar-title">Questions?</div>
+      <ul class="sidebar-list">
+        <li>Not sure which form to use? If you don't have a file yet, use Design + Print.</li>
       </ul>
       <a href="contact.html" class="sidebar-link">Contact us →</a>
     </div>
   </aside>
+
 </div>
 
 <footer>
@@ -168,25 +297,41 @@
 </footer>
 
 <script>
-  // Form submission → show success screen
-  const form = document.getElementById('order-form');
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault(); // This stops the redirect to Formspree
-    
-    const data = new FormData(form);
-    const res  = await fetch(form.action, { 
-      method: 'POST', 
-      body: data, 
-      headers: { 'Accept': 'application/json' } 
+  function switchTab(tab) {
+    const isPrint = tab === 'print';
+    document.getElementById('tab-print').classList.toggle('active', isPrint);
+    document.getElementById('tab-design').classList.toggle('active', !isPrint);
+    document.getElementById('panel-print').classList.toggle('active', isPrint);
+    document.getElementById('panel-design').classList.toggle('active', !isPrint);
+    document.getElementById('sidebar-print-info').style.display  = isPrint ? '' : 'none';
+    document.getElementById('sidebar-design-info').style.display = isPrint ? 'none' : '';
+    document.getElementById('sidebar-file-tips').style.display   = isPrint ? '' : 'none';
+    document.getElementById('sidebar-design-tips').style.display = isPrint ? 'none' : '';
+  }
+
+  async function handleSubmit(formId, successTitle, successBody) {
+    const form = document.getElementById(formId);
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const res = await fetch(form.action, {
+        method: 'POST', body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        document.getElementById('success-title').textContent = successTitle;
+        document.getElementById('success-body').textContent  = successBody;
+        document.getElementById('success').classList.add('show');
+        form.reset();
+      } else {
+        alert('Something went wrong. Please try again or contact us directly.');
+      }
     });
-    
-    if (res.ok) {
-      document.getElementById('success').classList.add('show');
-      form.reset();
-    } else {
-      alert('Something went wrong. Please try again or contact us directly.');
-    }
-  });
+  }
+
+  handleSubmit('print-form', 'Order Received',
+    "We've got your request. Expect a quote in your inbox within a few hours — we'll confirm before printing anything.");
+  handleSubmit('design-form', 'Design Request Received',
+    "We've received your idea. We'll review it and may follow up with questions before sending your quote.");
 </script>
 </body>
 </html>
